@@ -26,6 +26,13 @@ public class Student extends Person {
     public String getNumber() {
         return number;
     }
+    @Override
+    public void print(){
+        super.print();
+        System.out.println("School: " + this.getSchool());
+        System.out.println("Grade: " + this.getGrade());
+        System.out.println("Student number: " + this.getNumber());
+    }
 
     public static void main(String[] args) {
         Student student = new Student();
@@ -36,8 +43,13 @@ public class Student extends Person {
         student.setNumber("0123456");
 
         student.print();
+
+        System.out.println("-----------------------------");
+
         System.out.println("School: " + student.getSchool());
         System.out.println("Grade: " + student.getGrade());
         System.out.println("Student number: " + student.getNumber());
+        System.out.println("Name: " + student.getName());
+        System.out.println("Address: " + student.getAddress());
     }
 }
