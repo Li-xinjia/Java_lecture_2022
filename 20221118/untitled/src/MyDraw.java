@@ -3,28 +3,76 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-enum statueDraw {
-    LINE, RECT, OVAL
+/*
+ * 変更点：
+ * - 完全にMCVモデルを変わるのが困難で、画板とツールバーを分離した。
+ * - Starを描画できるようにした。
+ */
+
+enum StatueDraw { //これはモデル（データベース）として使っている。
+    LINE, RECT, OVAL, STAR
+}
+
+class DrawControlWindow extends JFrame {
+    public static final JButton bLine = new JButton("Line");
+    public static final JButton bRect = new JButton("Rect");
+    public static final JButton bOval = new JButton("Oval");
+    public static final JButton bStar = new JButton("Star");
+    public static final JButton bBlack = new JButton("Black");
+    public static final JButton bRed = new JButton("Red");
+    public static final JButton bGreen = new JButton("Green");
+    public static final JButton bClear = new JButton("Clear");
+    public static final JButton bQuit = new JButton("Quit");
+
+    public DrawControlWindow(MyDraw ml) {
+        this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        this.setSize(400, 200);
+        this.setTitle("ToolBar");
+        Container cTool = this.getContentPane();
+        cTool.setLayout(new FlowLayout());
+
+        cTool.add(bLine);
+        cTool.add(bRect);
+        cTool.add(bOval);
+        cTool.add(bStar);
+        cTool.add(bBlack);
+        cTool.add(bRed);
+        cTool.add(bGreen);
+        cTool.add(bClear);
+        cTool.add(bQuit);
+
+        bLine.addActionListener(ml);
+        bRect.addActionListener(ml);
+        bOval.addActionListener(ml);
+        bStar.addActionListener(ml);
+        bBlack.addActionListener(ml);
+        bRed.addActionListener(ml);
+        bGreen.addActionListener(ml);
+        bClear.addActionListener(ml);
+        bQuit.addActionListener(ml);
+    }
+
+    public void showToolBar() {
+        this.setVisible(true);
+    }
+
+    public void unShowToolBar() {
+        this.setVisible(false);
+    }
 }
 
 public class MyDraw extends JPanel implements MouseListener, ActionListener {
+    private final Vector<Point> startPointsVector = new Vector<>();
+    private final Vector<Point> endPointsVector = new Vector<>();
+    private final Vector<StatueDraw> statueDrawVector = new Vector<>();
+    private final Vector<Color> statueColorVector = new Vector<>();
 
-    private final int now_p = 0;
-    private final Vector<Point> startPointsVector = new Vector<Point>();
-    private final Vector<Point> endPointsVector = new Vector<Point>();
-    private Vector<statueDraw> statueDrawVector = new Vector<statueDraw>();
-    private Vector<Color> statueColorVector = new Vector<Color>();
+    private static final JMenuBar menuBar = new JMenuBar();
+    private static final JMenu menuTool = new JMenu("Tools");
+    private static final JMenuItem menuItemToolBar = new JMenuItem("ToolBar");
+    private final DrawControlWindow toolBar = new DrawControlWindow(this);
 
-    private static final JButton bLine = new JButton("Line");
-    private static final JButton bRect = new JButton("Rect");
-    private static final JButton bOval = new JButton("Oval");
-    private static final JButton bBlack = new JButton("Black");
-    private static final JButton bRed = new JButton("Red");
-    private static final JButton bGreen = new JButton("Green");
-    private static final JButton bClear = new JButton("Clear");
-    private static final JButton bQuit = new JButton("Quit");
-
-    private statueDraw statue_d = statueDraw.LINE;
+    private StatueDraw statue_d = StatueDraw.LINE;
     private Color statue_c = Color.black;
 
     public static void main(String[] args) {
@@ -39,29 +87,26 @@ public class MyDraw extends JPanel implements MouseListener, ActionListener {
         ml.setLocation(0, 0);
         c.add(ml);
 
-        ml.add(bLine);
-        ml.add(bRect);
-        ml.add(bOval);
-        ml.add(bBlack);
-        ml.add(bRed);
-        ml.add(bGreen);
-        ml.add(bClear);
-        ml.add(bQuit);
-
-        bLine.addActionListener(ml);
-        bRect.addActionListener(ml);
-        bOval.addActionListener(ml);
-        bBlack.addActionListener(ml);
-        bRed.addActionListener(ml);
-        bGreen.addActionListener(ml);
-        bClear.addActionListener(ml);
-        bQuit.addActionListener(ml);
-
         f.setVisible(true);
     }
 
     public MyDraw() {
         addMouseListener(this);
+        menuBar.add(menuTool);
+        menuTool.add(menuItemToolBar);
+        menuItemToolBar.addActionListener(this);
+        this.setLayout(null);
+        menuBar.setSize(50,30);
+        menuBar.setLocation(0,0);
+        this.add(menuBar);
+    }
+
+    public void drawStar(Graphics g, int x, int y, int width, int height) {
+        g.drawLine(x + width / 2, y, (int) (x + 0.1755 * width), y + height);
+        g.drawLine(x + width / 2, y, (int) (x + 0.8244 * width), y + height);
+        g.drawLine(x, (int) (y + 0.3292 * height), x + width, (int) (y + 0.3292 * height));
+        g.drawLine(x, (int) (y + 0.3292 * height), (int) (x + 0.8244 * width), y + height);
+        g.drawLine(x + width, (int) (y + 0.3292 * height), (int) (x + 0.1755 * width), y + height);
     }
 
     @Override
@@ -72,6 +117,11 @@ public class MyDraw extends JPanel implements MouseListener, ActionListener {
 
             int width = (endPointsVector.get(i).x - startPointsVector.get(i).x);
             int height = (endPointsVector.get(i).y - startPointsVector.get(i).y);
+
+            if (statueDrawVector.get(i) == StatueDraw.LINE){
+                g.drawLine(startPointsVector.get(i).x, startPointsVector.get(i).y, endPointsVector.get(i).x, endPointsVector.get(i).y);
+                continue;
+            }
 
             if (width < 0) {
                 int temp = startPointsVector.get(i).x;
@@ -88,15 +138,9 @@ public class MyDraw extends JPanel implements MouseListener, ActionListener {
             }
 
             switch (statueDrawVector.get(i)) {
-                case LINE:
-                    g.drawLine(startPointsVector.get(i).x, startPointsVector.get(i).y, endPointsVector.get(i).x, endPointsVector.get(i).y);
-                    break;
-                case RECT:
-                    g.drawRect(startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
-                    break;
-                case OVAL:
-                    g.drawOval(startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
-                    break;
+                case RECT -> g.drawRect(startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
+                case OVAL -> g.drawOval(startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
+                case STAR -> drawStar(g, startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
             }
         }
     }
@@ -135,26 +179,30 @@ public class MyDraw extends JPanel implements MouseListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == bLine) {
-            statue_d = statueDraw.LINE;
-        } else if (e.getSource() == bRect) {
-            statue_d = statueDraw.RECT;
-        } else if (e.getSource() == bOval) {
-            statue_d = statueDraw.OVAL;
-        } else if (e.getSource() == bBlack) {
+        if (e.getSource() == DrawControlWindow.bLine) {
+            statue_d = StatueDraw.LINE;
+        } else if (e.getSource() == DrawControlWindow.bRect) {
+            statue_d = StatueDraw.RECT;
+        } else if (e.getSource() == DrawControlWindow.bOval) {
+            statue_d = StatueDraw.OVAL;
+        } else if (e.getSource() == DrawControlWindow.bStar) {
+            statue_d = StatueDraw.STAR;
+        } else if (e.getSource() == DrawControlWindow.bBlack) {
             statue_c = Color.black;
-        } else if (e.getSource() == bRed) {
+        } else if (e.getSource() == DrawControlWindow.bRed) {
             statue_c = Color.red;
-        } else if (e.getSource() == bGreen) {
+        } else if (e.getSource() == DrawControlWindow.bGreen) {
             statue_c = Color.green;
-        } else if (e.getSource() == bClear) {
+        } else if (e.getSource() == DrawControlWindow.bClear) {
             startPointsVector.clear();
             endPointsVector.clear();
             statueDrawVector.clear();
             statueColorVector.clear();
             repaint();
-        } else if (e.getSource() == bQuit) {
+        } else if (e.getSource() == DrawControlWindow.bQuit) {
             System.exit(0);
+        }else if (e.getSource() == menuItemToolBar){
+            toolBar.showToolBar();
         }
     }
 }
