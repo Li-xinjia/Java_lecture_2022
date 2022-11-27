@@ -9,7 +9,7 @@ import javax.swing.*;
  * - Starを描画できるようにした。
  */
 
-enum StatueDraw { //これはモデル（データベース）として使っている。
+enum StatueDraw {
     LINE, RECT, OVAL, STAR
 }
 
