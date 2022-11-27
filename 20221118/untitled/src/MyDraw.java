@@ -73,6 +73,11 @@ public class MyDraw extends JPanel implements MouseListener, ActionListener {
             int width = (endPointsVector.get(i).x - startPointsVector.get(i).x);
             int height = (endPointsVector.get(i).y - startPointsVector.get(i).y);
 
+            if (statueDrawVector.get(i) == statueDraw.LINE){
+                g.drawLine(startPointsVector.get(i).x, startPointsVector.get(i).y, endPointsVector.get(i).x, endPointsVector.get(i).y);
+                continue;
+            }
+
             if (width < 0) {
                 int temp = startPointsVector.get(i).x;
                 startPointsVector.set(i, new Point(endPointsVector.get(i).x, startPointsVector.get(i).y));
@@ -88,18 +93,12 @@ public class MyDraw extends JPanel implements MouseListener, ActionListener {
             }
 
             switch (statueDrawVector.get(i)) {
-                case LINE:
-                    g.drawLine(startPointsVector.get(i).x, startPointsVector.get(i).y, endPointsVector.get(i).x, endPointsVector.get(i).y);
-                    break;
-                case RECT:
-                    g.drawRect(startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
-                    break;
-                case OVAL:
-                    g.drawOval(startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
-                    break;
+                case RECT -> g.drawRect(startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
+                case OVAL -> g.drawOval(startPointsVector.get(i).x, startPointsVector.get(i).y, width, height);
             }
         }
     }
+
 
     @Override
     public void mousePressed(MouseEvent e) {
