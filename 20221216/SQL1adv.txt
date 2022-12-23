@@ -1,0 +1,16 @@
+(1)
+SELECT sno,Goods.gno,gname,price,qty,price*qty AS aos FROM Goods,Stock;
+
+(2)
+SELECT Goods.gno,qty,sno,gname,price FROM Goods,Stock ORDER BY Goods.gno ASC, qty DESC;
+
+(3)
+SELECT Goods.gno,Supplier.sno,gname,price,qty,priority FROM Goods,Stock,Supplier WHERE priority>0 AND qty<=2;
+
+(4)
+SELECT g1.pname,g2.pname,g3.pname FROM person g1,person g2,person g3 WHERE g1.child_name = g2.pname AND g2.child_name = g3.pname;
+
+(5)
+SELECT gno,gname,price
+FROM Goods
+WHERE price > (SELECT price FROM Goods WHERE gno = 'G1')

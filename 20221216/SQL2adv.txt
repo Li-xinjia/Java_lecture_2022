@@ -1,0 +1,47 @@
+(1)
+SELECT gname, color, price, gno
+FROM Goods WHERE length(gname) = 6
+
+(2)
+SELECT gname, color, price, gno
+FROM Goods
+WHERE color IS NOT NULL
+  AND color <> ''
+  AND price > 100
+
+(3)
+SELECT sno, sum(qty)
+FROM Stock
+GROUP BY sno
+HAVING sum(qty) >= 5
+
+(4)
+SELECT gno, sum(qty)
+FROM Stock
+GROUP BY gno
+ORDER BY sum(qty) DESC
+
+(5)
+SELECT Stock.gno, sum(Stock.qty) * Goods.price
+FROM Stock
+         JOIN Goods on Stock.gno = Goods.gno
+GROUP BY Stock.gno
+HAVING sum(Stock.qty) * Goods.price >= 500
+ORDER BY sum(Stock.qty) * Goods.price DESC
+
+(6)
+-- 前の課題はすでに孫いる人だけを出力しているが、日本語の意味よくわからないです。
+SELECT g1.pname, g2.pname, g3.pname
+FROM person g1,
+     person g2,
+     person g3
+WHERE g1.child_name = g2.pname
+  AND g2.child_name = g3.pname
+
+(7)
+SELECT g2.gname, g2.color, g2.price, g2.gno
+FROM Goods g1,
+     Goods g2
+WHERE g1.price >= 100
+  AND g1.price <= 200
+  AND g1.color = g2.color
